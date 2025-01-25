@@ -1,6 +1,7 @@
 import random
 import time
 from web3 import Web3
+from web3.middleware import geth_poa_middleware
 from dotenv import load_dotenv
 import os
 
@@ -11,12 +12,19 @@ load_dotenv()
 BASE_RPC_URL = ("https://mainnet.base.org")
 web3 = Web3(Web3.HTTPProvider(BASE_RPC_URL))
 
+# Tambahkan middleware untuk chain yang menggunakan konsensus POA (Proof of Authority)
+web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+
 # Alamat contract
 CONTRACT_ADDRESS = "0xC5bf05cD32a14BFfb705Fb37a9d218895187376c"
 
 # Wallet pengirim
 SENDER_ADDRESS = os.getenv("SENDER_ADDRESS")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+
+# Fungsi untuk mengonversi Ether ke Wei
+def to_wei(value, unit="ether"):
+    return web3.utils.to_wei(value, unit)
 
 # Fungsi untuk mengirim transaksi
 def send_transaction():
@@ -25,7 +33,7 @@ def send_transaction():
         value = random.uniform(0.000000001, 0.000000002)
 
         # Konversi jumlah ke wei (BASE menggunakan 18 desimal seperti Ethereum)
-        value_in_wei = web3.toWei(value, "ether")
+        value_in_wei = to_wei(value, "ether")
 
         # Dapatkan nonce untuk transaksi
         nonce = web3.eth.getTransactionCount(SENDER_ADDRESS)
@@ -35,7 +43,7 @@ def send_transaction():
             "to": CONTRACT_ADDRESS,
             "value": value_in_wei,
             "gas": 21000,  # Gas standar untuk transfer
-            "gasPrice": web3.toWei("10", "gwei"),  # Gas price (dapat disesuaikan)
+            "gasPrice": to_wei(10, "gwei"),  # Gas price (dapat disesuaikan)
             "nonce": nonce,
             "chainId": 8453,  # Chain ID untuk BASE mainnet
         }
