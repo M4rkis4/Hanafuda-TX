@@ -127,13 +127,13 @@ for i in range(num_transactions):
             tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
 
             tx_hash_hex = tx_receipt['transactionHash'].hex()
-            print(Fore.GREEN + f"Transaction {i + 1} sent from {short_from_address} with hash: {tx_hash_hex}")
+            print(Fore.GREEN + f"Transaksi ke-{i + 1} dari {short_from_address} hash: {tx_hash_hex}")
 
             if not tx_hash_hex.startswith('0x'):
                 tx_hash_hex = '0x' + tx_hash_hex
             validate_tx_hash(tx_hash_hex)
 
-            print(Fore.YELLOW + f"Syncing transaction with hash: {tx_hash_hex}", end='\r')
+            print(Fore.YELLOW + f"Sinkronisasi transaksi dengan hash: {tx_hash_hex}", end='\r')
 
             sync_response = sync_transaction(tx_hash_hex, chain_id, access_token)
 
@@ -149,7 +149,7 @@ for i in range(num_transactions):
 
         except Exception as e:
             if 'nonce too low' in str(e):
-                print(Fore.RED + f"Nonce too low for {short_from_address}. Fetching the latest nonce...")
+                print(Fore.RED + f"Nilai terlalu rendah untuk {short_from_address}. Mengambil data terbaru...")
                 nonces[private_key] = web3.eth.get_transaction_count(from_address)
             else:
                 print(Fore.RED + f"Kesalahan saat mengirim transaksi dari {short_from_address}: {str(e)}")
